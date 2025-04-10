@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Arcade</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            margin: 50px auto;
+            padding: 20px;
+            max-width: 900px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .game {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            margin: 20px auto;
+            width: 80%;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .game img {
+            width: 100px;
+            height: 100px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .play-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #ffcc00;
+            color: black;
+            text-decoration: none;
+            font-size: 1.2em;
+            border-radius: 5px;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        .play-button:hover {
+            background: #ff9900;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to AI-Arcade!</h1>
+        
+        <div class="game">
+            <img src="dino_logo.png" alt="Dino Game Logo">
+            <h2>Chrome Dino</h2>
+            <p>Uses Reinforcement Learning AI</p>
+            <a href="/dino" class="play-button">Play</a>
+        </div>
+
+        <div class="game">
+            <img src="chess_logo.png" alt="Chess AI Logo">
+            <h2>AI Chess</h2>
+            <p>Uses Minimax Algorithm with Alpha-Beta Pruning</p>
+            <a href="/chess" class="play-button">Play</a>
+        </div>
+
+        <div class="game">
+            <img src="tictactoe_logo.png" alt="Tic-Tac-Toe Logo">
+            <h2>AI Tic-Tac-Toe</h2>
+            <p>Uses Minimax Algorithm</p>
+            <a href="/tictactoe" class="play-button">Play</a>
+        </div>
+    </div>
+</body>
+</html>

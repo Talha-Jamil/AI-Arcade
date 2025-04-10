@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrome Dino - AI Arcade</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dino.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Chrome Dino Game</h1>
+        
+        <div class="game-container">
+            <canvas id="gameCanvas" width="800" height="400"></canvas>
+        </div>
+        
+        <!-- Game controls and stats will be added by dino_visualization.js -->
+        
+        <button class="back-button" onclick="window.location.href='/'">Back to Home</button>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/dino.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dino_visualization.js') }}"></script>
+</body>
+</html>

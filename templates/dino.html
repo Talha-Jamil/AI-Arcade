@@ -3,38 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chrome Dino</title>
-    <style>
-        body {
-            text-align: center;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #6e8efb, #a777e3);
-            color: white;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            margin: 50px auto;
-            padding: 20px;
-            max-width: 900px;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 10px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-        }
-        iframe {
-            width: 100%;
-            max-width: 800px;
-            height: 400px;
-            border: 5px solid white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-        }
-    </style>
+    <title>Chrome Dino - AI Arcade</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dino.css') }}">
 </head>
 <body>
     <div class="container">
         <h1>Chrome Dino Game</h1>
-        <iframe src="https://chromedino.com/" title="Chrome Dino Game"></iframe>
+        
+        <div class="game-container">
+            <canvas id="gameCanvas" width="800" height="400"></canvas>
+        </div>
+        
+        <!-- Game controls and stats will be added by dino_visualization.js -->
+        
+        <button class="back-button" onclick="window.location.href='/'">Back to Home</button>
     </div>
+    
+    <script src="{{ url_for('static', filename='js/dino.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/dino_visualization.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/ai_connector.js') }}"></script>
 </body>
 </html>

@@ -1,75 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flappy Bird - AI Arcade</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/flappy.css') }}">
+  <meta charset="UTF-8">
+  <title>Uzair Abbas’s Flappy Bird AI</title>
+  <meta name="author" content="Uzair Abbas">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Flappy-specific styling -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/flappy.css') }}">
+
+  <!-- Optional: Google Fonts & Font Awesome -->
+  <link
+    href="https://fonts.googleapis.com/css?family=Courgette|Gloria+Hallelujah|Righteous|Satisfy"
+    rel="stylesheet">
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Flappy Bird</h1>
-        
-        <div class="mode-selector">
-            <input type="radio" id="player-mode" name="game-mode" value="player" checked>
-            <label for="player-mode">Player Mode</label>
-            
-            <input type="radio" id="ai-mode" name="game-mode" value="ai">
-            <label for="ai-mode">AI Mode</label>
-            
-            <input type="radio" id="both-mode" name="game-mode" value="both">
-            <label for="both-mode">Player + AI Mode</label>
-        </div>
-        
-        <div class="game-container">
-            <canvas id="gameCanvas" width="800" height="600"></canvas>
-        </div>
-        
-        <div class="controls">
-            <button id="start-button">Start Game</button>
-            <button id="train-ai-button">Train AI</button>
-            <button id="reset-button">Reset</button>
-        </div>
-        
-        <div class="stats">
-            <div class="stat-box">
-                <h3>Score</h3>
-                <p id="score">0</p>
-            </div>
-            <div class="stat-box">
-                <h3>High Score</h3>
-                <p id="high-score">0</p>
-            </div>
-            <div class="stat-box">
-                <h3>Generation</h3>
-                <p id="generation">0</p>
-            </div>
-            <div class="stat-box">
-                <h3>AI Score</h3>
-                <p id="ai-score">0</p>
-            </div>
-        </div>
-        
-        <div class="charts">
-            <div class="chart">
-                <h3>Fitness Over Generations</h3>
-                <img id="fitness-chart" src="" alt="Fitness Chart">
-            </div>
-            <div class="chart">
-                <h3>Species Count</h3>
-                <img id="species-chart" src="" alt="Species Chart">
-            </div>
-            <div class="chart">
-                <h3>Neural Network</h3>
-                <img id="network-chart" src="" alt="Network Structure">
-            </div>
-        </div>
-        
-        <button class="back-button" onclick="window.location.href='/'">Back to Home</button>
-    </div>
-    
-    <script src="{{ url_for('static', filename='js/flappy.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/flappy_visualization.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/ai_connector.js') }}"></script>
+  <!-- Navigation -->
+  <nav style="padding:10px; text-align:center;">
+    <a href="{{ url_for('home') }}">Home</a> |
+    <a href="{{ url_for('dino') }}">Dino AI</a> |
+    <strong>Flappy AI</strong>
+  </nav>
+
+  <!-- Controls -->
+  <div id="controls" style="text-align:center; margin-bottom:10px;">
+    <label>
+      Speed:
+      <input id="speedSlider" type="range" min="1" max="100" value="1">
+    </label>
+    <span id="speed">1</span>
+    <span style="margin: 0 20px;">
+      High Score: <span id="hs">0</span>
+    </span>
+    <span style="margin: 0 20px;">
+      All-Time High Score: <span id="ahs">0</span>
+    </span>
+    <button id="best">Run Best</button>
+  </div>
+
+  <!-- Canvas will be injected here -->
+  <div id="canvascontainer"></div>
+
+  <!-- p5.js (you can switch to local files under static/js if preferred) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.dom.min.js"></script>
+
+  <!-- Neural‐net libraries -->
+  <script src="{{ url_for('static', filename='js/nn.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/matrix.js') }}"></script>
+
+  <!-- Flappy Bird AI code -->
+  <script src="{{ url_for('static', filename='js/sketch.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/ga.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bird.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/pipe.js') }}"></script>
 </body>
 </html>

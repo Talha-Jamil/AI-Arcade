@@ -4,6 +4,7 @@ const restartBtn = document.getElementById('restart');
 let board = Array(9).fill('');
 const human = 'X';
 const aiSymbol = 'O';
+let gameActive = true;
 
 function render() {
   board.forEach((val, idx) => cells[idx].innerText = val);
@@ -33,17 +34,37 @@ async function aiMoveFor(symbol) {
   const { move } = await res.json();
   board[move] = symbol;
   render();
+  return move;
+}
+
+function showWinMessage(winner) {
+  alert(winner === 'Draw' ? "It's a draw!" : `${winner} wins!`);
+  gameActive = true;
 }
 
 async function playHumanVsAI(index) {
-  if (board[index]) return;
+  if (!gameActive || board[index]) return;
+  gameActive = false;
+  
+  // Human move
   board[index] = human;
   render();
+  
   let winner = checkWinnerJS(board);
-  if (winner) return alert(winner === 'Draw' ? "It's a draw!" : `${winner} wins!`);
-  await aiMoveFor(aiSymbol);
+  if (winner) {
+    showWinMessage(winner);
+    return;
+  }
+  
+  // AI move
+  const aiMove = await aiMoveFor(aiSymbol);
   winner = checkWinnerJS(board);
-  if (winner) alert(winner === 'Draw' ? "It's a draw!" : `${winner} wins!`);
+  if (winner) {
+    showWinMessage(winner);
+    return;
+  }
+  
+  gameActive = true;
 }
 
 async function playAIvsAI() {
@@ -51,13 +72,16 @@ async function playAIvsAI() {
   render();
   let current = 'X';
   let winner = null;
+  
   while (!winner) {
-    await new Promise(r => setTimeout(r, 500));
     await aiMoveFor(current);
     winner = checkWinnerJS(board);
+    if (winner) {
+      showWinMessage(winner);
+      break;
+    }
     current = current === 'X' ? 'O' : 'X';
   }
-  alert(winner === 'Draw' ? "It's a draw!" : `${winner} wins!`);
 }
 
 // Event listeners
@@ -70,12 +94,14 @@ cells.forEach(cell => cell.addEventListener('click', e => {
 modeSelect.addEventListener('change', () => {
   board = Array(9).fill('');
   render();
+  gameActive = true;
   if (modeSelect.value === 'ai') playAIvsAI();
 });
 
 restartBtn.addEventListener('click', () => {
   board = Array(9).fill('');
   render();
+  gameActive = true;
   if (modeSelect.value === 'ai') playAIvsAI();
 });
 

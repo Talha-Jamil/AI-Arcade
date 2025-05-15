@@ -22,6 +22,10 @@ def home():
 def dino():
     return render_template('dino.html')
 
+@app.route('/chess')
+def chess():
+    return render_template('chess.html')
+
 @app.route('/flappy')
 def flappy():
     return render_template('flappy.html')

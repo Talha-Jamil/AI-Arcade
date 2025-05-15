@@ -1,61 +1,107 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Uzair Abbas’s Flappy Bird AI</title>
-  <meta name="author" content="Uzair Abbas">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Flappy-specific styling -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/flappy.css') }}">
+<meta charset="UTF-8">
 
-  <!-- Optional: Google Fonts & Font Awesome -->
-  <link
-    href="https://fonts.googleapis.com/css?family=Courgette|Gloria+Hallelujah|Righteous|Satisfy"
-    rel="stylesheet">
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<title>Uzair Abbas’s Flappy Bird AI</title>
+
+<meta name="author" content="Uzair Abbas">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Flappy-specific styling -->
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/flappy.css') }}">
+
+<!-- Optional: Google Fonts & Font Awesome -->
+
+<link
+
+href="https://fonts.googleapis.com/css?family=Courgette|Gloria+Hallelujah|Righteous|Satisfy"
+
+rel="stylesheet">
+
+<link
+
+rel="stylesheet"
+
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
 </head>
+
 <body>
-  <!-- Navigation -->
-  <nav style="padding:10px; text-align:center;">
-    <a href="{{ url_for('home') }}">Home</a> |
-    <a href="{{ url_for('dino') }}">Dino AI</a> |
-    <strong>Flappy AI</strong>
-  </nav>
 
-  <!-- Controls -->
-  <div id="controls" style="text-align:center; margin-bottom:10px;">
-    <label>
-      Speed:
-      <input id="speedSlider" type="range" min="1" max="100" value="1">
-    </label>
-    <span id="speed">1</span>
-    <span style="margin: 0 20px;">
-      High Score: <span id="hs">0</span>
-    </span>
-    <span style="margin: 0 20px;">
-      All-Time High Score: <span id="ahs">0</span>
-    </span>
-    <button id="best">Run Best</button>
-  </div>
+<!-- Navigation -->
 
-  <!-- Canvas will be injected here -->
-  <div id="canvascontainer"></div>
+<nav style="padding:10px; text-align:center;">
 
-  <!-- p5.js (you can switch to local files under static/js if preferred) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.dom.min.js"></script>
+<a href="{{ url_for('home') }}">Home</a> |
 
-  <!-- Neural‐net libraries -->
-  <script src="{{ url_for('static', filename='js/nn.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/matrix.js') }}"></script>
+<a href="{{ url_for('dino') }}">Dino AI</a> |
 
-  <!-- Flappy Bird AI code -->
-  <script src="{{ url_for('static', filename='js/sketch.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/ga.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/bird.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/pipe.js') }}"></script>
+<strong>Flappy AI</strong>
+
+</nav>
+
+<!-- Controls -->
+
+<div id="controls" style="text-align:center; margin-bottom:10px;">
+
+<label>
+
+Speed:
+
+<input id="speedSlider" type="range" min="1" max="100" value="1">
+
+</label>
+
+<span id="speed">1</span>
+
+<span style="margin: 0 20px;">
+
+High Score: <span id="hs">0</span>
+
+</span>
+
+<span style="margin: 0 20px;">
+
+All-Time High Score: <span id="ahs">0</span>
+
+</span>
+
+<button id="best">Run Best</button>
+
+</div>
+
+<!-- Canvas will be injected here -->
+
+<div id="canvascontainer"></div>
+
+<!-- p5.js (you can switch to local files under static/js if preferred) -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/p5.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.6.0/addons/p5.dom.min.js"></script>
+
+<!-- Neural‐net libraries -->
+
+<script src="{{ url_for('static', filename='js/nn.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/matrix.js') }}"></script>
+
+<!-- Flappy Bird AI code -->
+
+<script src="{{ url_for('static', filename='js/sketch.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/ga.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/bird.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/pipe.js') }}"></script>
+
 </body>
+
 </html>

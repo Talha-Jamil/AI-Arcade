@@ -1,0 +1,34 @@
+.text-align-center {
+    text-align: center;
+}
+
+#myBoard {
+    max-width: 100%;
+    height: auto;
+}
+
+.highlight-white {
+    box-shadow: inset 0 0 3px 3px rgba(255, 255, 255);
+}
+
+.highlight-black {
+    box-shadow: inset 0 0 3px 3px rgba(0, 0, 0);
+}
+
+.highlight-hint {
+    box-shadow: inset 0 0 3px 3px rgba(0, 0, 255, 0.5);
+}
+
+.no-outline:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+
+.button-active{
+    background-color: rgb(37, 37, 37);
+}
+
+#make-center{
+    text-align: center;
+}

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, redirect, url_for, session, flash
 import os
 import base64
 import io
@@ -7,26 +7,60 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import numpy as np
 from dino_ai import DinoGameAI
 from flappy_ai import FlappyBirdAI
+from functools import wraps
+import sqlite3
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)  # Generate a secure secret key
 
 # Initialize AI instances
 dino_ai   = DinoGameAI()
 flappy_ai = FlappyBirdAI()
 
+def init_db():
+    conn = sqlite3.connect('users.db')
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS users
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
+                  username TEXT UNIQUE NOT NULL,
+                  password TEXT NOT NULL,
+                  email TEXT UNIQUE NOT NULL)''')
+    conn.commit()
+    conn.close()
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user' not in session:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.before_request
+def require_login():
+    allowed_routes = {'login', 'signup', 'static'}
+    if request.endpoint not in allowed_routes and not request.endpoint.startswith('static'):
+        if 'user' not in session:
+            return redirect(url_for('login'))
+
 @app.route('/')
+@login_required
 def home():
     return render_template('index.html')
 
 @app.route('/dino')
+@login_required
 def dino():
     return render_template('dino.html')
 
 @app.route('/chess')
+@login_required
 def chess():
     return render_template('chess.html')
 
 @app.route('/flappy')
+@login_required
 def flappy():
     return render_template('flappy.html')
 
@@ -142,6 +176,7 @@ def placeholder_charts():
 
 # --- TIC TAC TOE ---
 @app.route('/tictactoe')
+@login_required
 def tic_tac_toe():
     return render_template('tictactoe.html')
 
@@ -194,7 +229,61 @@ def tictactoe_ai_move():
     _, move      = minimax(board, ai_symbol, ai_symbol, human_symbol)
     return jsonify({ 'move': move })
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        conn = sqlite3.connect('users.db')
+        c = conn.cursor()
+        c.execute('SELECT * FROM users WHERE username = ?', (username,))
+        user = c.fetchone()
+        conn.close()
+        
+        if user and check_password_hash(user[2], password):
+            session['user'] = username
+            return redirect(url_for('home'))
+        else:
+            flash('Invalid username or password')
+    
+    return render_template('login.html')
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        email = request.form['email']
+        
+        hashed_password = generate_password_hash(password)
+        
+        try:
+            conn = sqlite3.connect('users.db')
+            c = conn.cursor()
+            c.execute('INSERT INTO users (username, password, email) VALUES (?, ?, ?)',
+                     (username, hashed_password, email))
+            conn.commit()
+            conn.close()
+            
+            session['user'] = username
+            return redirect(url_for('home'))
+        except sqlite3.IntegrityError:
+            flash('Username or email already exists')
+        except Exception as e:
+            flash('An error occurred during signup')
+    
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect(url_for('login'))
+
 if __name__ == '__main__':
+    # Initialize database
+    init_db()
+    
     # Ensure directories exist
     os.makedirs('static/images', exist_ok=True)
     os.makedirs('checkpoints', exist_ok=True)

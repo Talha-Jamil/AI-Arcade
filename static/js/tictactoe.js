@@ -6,8 +6,22 @@ const human = 'X';
 const aiSymbol = 'O';
 let gameActive = true;
 
+let turnDisplay = document.createElement('div');
+turnDisplay.id = 'turnDisplay';
+document.body.insertBefore(turnDisplay, document.body.firstChild);
+
+function updateTurnDisplay(turn) {
+  turnDisplay.innerText = `Turn: ${turn}`;
+}
+
 function render() {
   board.forEach((val, idx) => cells[idx].innerText = val);
+  let currentTurn = board.filter(x => x).length % 2 === 0 ? human : aiSymbol;
+  if (modeSelect.value === 'human') {
+    updateTurnDisplay(gameActive ? (currentTurn === human ? 'Your' : "AI's") : '');
+  } else {
+    updateTurnDisplay(gameActive ? (currentTurn === 'X' ? 'AI X' : 'AI O') : '');
+  }
 }
 
 function checkWinnerJS(arr) {
@@ -52,19 +66,28 @@ async function playHumanVsAI(index) {
   
   let winner = checkWinnerJS(board);
   if (winner) {
+    updateTurnDisplay("AI's");
+    await new Promise(r => setTimeout(r, 1000));
     showWinMessage(winner);
     return;
   }
   
+  // Wait before AI move
+  updateTurnDisplay("AI's");
+  await new Promise(r => setTimeout(r, 1000));
   // AI move
   const aiMove = await aiMoveFor(aiSymbol);
+  render();
   winner = checkWinnerJS(board);
   if (winner) {
+    updateTurnDisplay('Your');
+    await new Promise(r => setTimeout(r, 1000));
     showWinMessage(winner);
     return;
   }
   
   gameActive = true;
+  updateTurnDisplay('Your');
 }
 
 async function playAIvsAI() {
@@ -72,11 +95,15 @@ async function playAIvsAI() {
   render();
   let current = 'X';
   let winner = null;
-  
+  gameActive = true;
   while (!winner) {
+    updateTurnDisplay(`AI ${current}`);
+    await new Promise(r => setTimeout(r, 1000));
     await aiMoveFor(current);
+    render();
     winner = checkWinnerJS(board);
     if (winner) {
+      await new Promise(r => setTimeout(r, 1000));
       showWinMessage(winner);
       break;
     }

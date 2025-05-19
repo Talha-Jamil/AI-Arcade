@@ -63,9 +63,15 @@
                     <h1 class="text-xl md:text-2xl font-bold text-white">AI Arcade</h1>
                 </div>
                 <div class="flex space-x-4">
-                    <button id="about-btn" class="px-3 py-2 rounded-md text-white hover:bg-white/20 transition">About</button>
-                    <button id="contact-btn" class="px-3 py-2 rounded-md text-white hover:bg-white/20 transition">Contact</button>
-                    <button id="theme-toggle" class="p-2 rounded-full bg-white/20 text-white">
+                    <button id="about-btn" class="px-3 py-2 rounded-md text-white hover:bg-white/20 transition" title="About AI Arcade">About</button>
+                    <button id="contact-btn" class="px-3 py-2 rounded-md text-white hover:bg-white/20 transition" title="Contact Us">Contact</button>
+                    <a href="{{ url_for('logout') }}" class="px-3 py-2 rounded-md text-white hover:bg-white/20 transition flex items-center" title="Logout from your account">
+                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        Logout
+                    </a>
+                    <button id="theme-toggle" class="p-2 rounded-full bg-white/20 text-white" title="Toggle dark/light theme">
                         <svg id="moon-icon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
                         </svg>
@@ -99,7 +105,7 @@
                         <p class="text-white/70 mb-4 text-center">Uses NEAT Algorithm for AI Learning</p>
                         <div class="mt-auto flex flex-col gap-2 w-full">
                             <a href="{{ url_for('dino') }}" class="btn-play bg-accent hover:bg-accent-hover text-black font-bold py-2 px-6 rounded-md transition text-center">Play Game</a>
-                            <a href="https://www.youtube.com/watch?v=yVtdp1kF0I4" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-md transition text-center" title="Learn more about NEAT Algorithm">Learn More</a>
+                            <a href="https://www.youtube.com/watch?v=yVtdp1kF0I4" target="_blank" rel="noopener" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-md transition text-center" title="Learn more about NEAT Algorithm">Learn More</a>
                         </div>
                     </div>
                     <div class="card-back bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-sm">
@@ -126,7 +132,7 @@
                         <p class="text-white/70 mb-4 text-center">Uses NEAT Algorithm for AI Learning</p>
                         <div class="mt-auto flex flex-col gap-2 w-full">
                             <a href="{{ url_for('flappy') }}" class="btn-play bg-accent hover:bg-accent-hover text-black font-bold py-2 px-6 rounded-md transition text-center">Play Game</a>
-                            <a href="https://www.youtube.com/watch?v=MMxFDaIOHsE" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-md transition text-center" title="Learn more about NEAT Algorithm">Learn More</a>
+                            <a href="https://www.youtube.com/watch?v=MMxFDaIOHsE" target="_blank" rel="noopener" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-md transition text-center" title="Learn more about NEAT Algorithm">Learn More</a>
                         </div>
                     </div>
                     <div class="card-back bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-sm">
@@ -153,7 +159,7 @@
                         <p class="text-white/70 mb-4 text-center">Uses Minimax with Alpha-Beta Pruning</p>
                         <div class="mt-auto flex flex-col gap-2 w-full">
                             <a href="{{ url_for('chess') }}" class="btn-play bg-accent hover:bg-accent-hover text-black font-bold py-2 px-6 rounded-md transition text-center">Play Game</a>
-                            <a href="https://www.youtube.com/watch?v=l-hh51ncgDI" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-md transition text-center" title="Learn more about Minimax with Alpha-Beta Pruning">Learn More</a>
+                            <a href="https://www.youtube.com/watch?v=l-hh51ncgDI" target="_blank" rel="noopener" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-md transition text-center" title="Learn more about Minimax with Alpha-Beta Pruning">Learn More</a>
                         </div>
                     </div>
                     <div class="card-back bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-sm">
@@ -180,7 +186,7 @@
                         <p class="text-white/70 mb-4 text-center">Uses Minimax Algorithm</p>
                         <div class="mt-auto flex flex-col gap-2 w-full">
                             <a href="{{ url_for('tic_tac_toe') }}" class="btn-play bg-accent hover:bg-accent-hover text-black font-bold py-2 px-6 rounded-md transition text-center">Play Game</a>
-                            <a href="https://www.youtube.com/watch?v=trKjYdBASyQ" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-md transition text-center" title="Learn more about Minimax Algorithm">Learn More</a>
+                            <a href="https://www.youtube.com/watch?v=trKjYdBASyQ" target="_blank" rel="noopener" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-md transition text-center" title="Learn more about Minimax Algorithm">Learn More</a>
                         </div>
                     </div>
                     <div class="card-back bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-sm">
@@ -219,7 +225,7 @@
             <div class="p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-bold text-gray-800 dark:text-white">About AI Arcade</h2>
-                    <button id="close-about" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
+                    <button id="close-about" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white" title="Close about modal">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -257,7 +263,7 @@
             <div class="p-6">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Contact Us</h2>
-                    <button id="close-contact" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
+                    <button id="close-contact" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white" title="Close contact modal">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>

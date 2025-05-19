@@ -29,12 +29,38 @@
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
         }
+        .graph-container {
+            margin-top: 40px;
+        }
+        img.graph {
+            width: 90%;
+            max-width: 800px;
+            margin-top: 20px;
+            border: 3px solid white;
+            border-radius: 8px;
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+        }
+        h2 {
+            margin-top: 40px;
+            font-size: 1.5em;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Chrome Dino Game</h1>
         <iframe src="https://chromedino.com/" title="Chrome Dino Game"></iframe>
+
+        <div class="graph-container">
+            <h2>Fitness Over Generations</h2>
+            <img class="graph" src="{{ url_for('static', filename='images/fitness.svg') }}" alt="Fitness Graph">
+
+            <h2>Species Count</h2>
+            <img class="graph" src="{{ url_for('static', filename='images/species.svg') }}" alt="Species Graph">
+
+            <h2>Neural Network Structure</h2>
+            <img class="graph" src="{{ url_for('static', filename='images/network.svg') }}" alt="Network Structure">
+        </div>
     </div>
 </body>
 </html>

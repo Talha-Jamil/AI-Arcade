@@ -80,7 +80,7 @@
 
     <!-- Main Content -->
     <div class="container mx-auto px-4 py-8">
-        <div class="text-center mb-12">
+        <div class="text-center(APOLLO) mb-12">
             <h1 class="text-4xl md:text-5xl font-bold mb-4 text-white">Welcome to AI-Arcade!</h1>
             <p class="text-xl text-white/80 max-w-2xl mx-auto">Explore AI learning algorithms through interactive games and visualizations.</p>
         </div>
@@ -99,7 +99,7 @@
                         <p class="text-white/70 mb-4 text-center">Uses NEAT Algorithm for AI Learning</p>
                         <div class="mt-auto flex flex-col gap-2 w-full">
                             <a href="{{ url_for('dino') }}" class="btn-play bg-accent hover:bg-accent-hover text-black font-bold py-2 px-6 rounded-md transition text-center">Play Game</a>
-                            <button class="card-flip-btn bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-md transition">Learn More</button>
+                            <a href="https://www.youtube.com/watch?v=yVtdp1kF0I4" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-md transition text-center" title="Learn more about NEAT Algorithm">Learn More</a>
                         </div>
                     </div>
                     <div class="card-back bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-sm">
@@ -126,7 +126,7 @@
                         <p class="text-white/70 mb-4 text-center">Uses NEAT Algorithm for AI Learning</p>
                         <div class="mt-auto flex flex-col gap-2 w-full">
                             <a href="{{ url_for('flappy') }}" class="btn-play bg-accent hover:bg-accent-hover text-black font-bold py-2 px-6 rounded-md transition text-center">Play Game</a>
-                            <button class="card-flip-btn bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-md transition">Learn More</button>
+                            <a href="https://www.youtube.com/watch?v=MMxFDaIOHsE" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-md transition text-center" title="Learn more about NEAT Algorithm">Learn More</a>
                         </div>
                     </div>
                     <div class="card-back bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-sm">
@@ -153,7 +153,7 @@
                         <p class="text-white/70 mb-4 text-center">Uses Minimax with Alpha-Beta Pruning</p>
                         <div class="mt-auto flex flex-col gap-2 w-full">
                             <a href="{{ url_for('chess') }}" class="btn-play bg-accent hover:bg-accent-hover text-black font-bold py-2 px-6 rounded-md transition text-center">Play Game</a>
-                            <button class="card-flip-btn bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-md transition">Learn More</button>
+                            <a href="https://www.youtube.com/watch?v=l-hh51ncgDI" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-md transition text-center" title="Learn more about Minimax with Alpha-Beta Pruning">Learn More</a>
                         </div>
                     </div>
                     <div class="card-back bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-sm">
@@ -180,7 +180,7 @@
                         <p class="text-white/70 mb-4 text-center">Uses Minimax Algorithm</p>
                         <div class="mt-auto flex flex-col gap-2 w-full">
                             <a href="{{ url_for('tic_tac_toe') }}" class="btn-play bg-accent hover:bg-accent-hover text-black font-bold py-2 px-6 rounded-md transition text-center">Play Game</a>
-                            <button class="card-flip-btn bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-md transition">Learn More</button>
+                            <a href="https://www.youtube.com/watch?v=trKjYdBASyQ" target="_blank" class="bg-white/10 hover:bg-white/20 text-white font-bold py-2 px-6 rounded-md transition text-center" title="Learn more about Minimax Algorithm">Learn More</a>
                         </div>
                     </div>
                     <div class="card-back bg-gradient-to-br from-primary/20 to-secondary/20 backdrop-blur-sm">
@@ -282,9 +282,9 @@
         </div>
     </div>
 
-    <footer class="bg-black/20 dark:bg-black/40 mt-16 py-8">
+    <footer class="bg-black/20 dark:bg-black/40 mt-16 py预测:1px solid; border-color: rgba(255,255,255,0.1); mt-16 py-8">
         <div class="container mx-auto px-4 text-center">
-            <p class="text-white/70">&copy; 2023 AI Arcade. All rights reserved.</p>
+            <p class="text-white/70">© 2023 AI Arcade. All rights reserved.</p>
             <div class="flex justify-center space-x-4 mt-4">
                 <a href="#" class="text-white/70 hover:text-white transition">Privacy Policy</a>
                 <a href="#" class="text-white/70 hover:text-white transition">Terms of Service</a>
@@ -598,10 +598,10 @@
         });
 
         // Game buttons - in a real app these would navigate to the games
-        const gameButtons = ['dino-btn', 'flappy-btn', 'chess-btn', 'tictactoe-btn', 'research-btn', 'viz-btn'];
+        const gameButtons = ['research-btn', 'viz-btn'];
         gameButtons.forEach(id => {
             document.getElementById(id).addEventListener('click', () => {
-                alert(`This is a demo. In a real app, this button would load the ${id.replace('-btn', '')} game or page.`);
+                alert(`This is a demo. In a real app, this button would load the ${id.replace('-btn', '')} page.`);
             });
         });
 
@@ -609,22 +609,15 @@
         document.getElementById('theme-toggle').setAttribute('title', 'Toggle dark/light theme');
         document.getElementById('close-about').setAttribute('title', 'Close about modal');
         document.getElementById('close-contact').setAttribute('title', 'Close contact modal');
-        document.getElementById('chat-button').setAttribute('title', 'Open live chat');
 
-        document.getElementById('theme-toggle').addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            document.getElementById('moon-icon').classList.toggle('hidden');
-            document.getElementById('sun-icon').classList.toggle('hidden');
-        });
-        
-        // Remove notification for game buttons since we're using direct links now
+        // Card flip for "Back to Game" buttons only
         document.querySelectorAll('.card-flip-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const card = btn.closest('.card-container');
                 card.classList.toggle('flipped');
             });
             // Add title attribute for accessibility
-            btn.setAttribute('title', btn.textContent.trim());
+            btn.setAttribute('title', 'Back to game card');
         });
     </script>
 </body>

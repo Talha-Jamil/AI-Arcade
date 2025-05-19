@@ -1,10 +1,6 @@
 from flask import Flask, render_template, jsonify, request, redirect, url_for, session, flash
 import os
-import base64
-import io
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-import numpy as np
+import logging
 from dino_ai import DinoGameAI
 from flappy_ai import FlappyBirdAI
 from functools import wraps
@@ -14,9 +10,24 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Generate a secure secret key
 
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 # Initialize AI instances
-dino_ai   = DinoGameAI()
-flappy_ai = FlappyBirdAI()
+try:
+    dino_ai = DinoGameAI()
+    logger.info("DinoGameAI initialized successfully")
+except Exception as e:
+    logger.error(f"Failed to initialize DinoGameAI: {e}")
+    dino_ai = None
+
+try:
+    flappy_ai = FlappyBirdAI()
+    logger.info("FlappyBirdAI initialized successfully")
+except Exception as e:
+    logger.error(f"Failed to initialize FlappyBirdAI: {e}")
+    flappy_ai = None
 
 def init_db():
     conn = sqlite3.connect('users.db')
@@ -47,137 +58,161 @@ def require_login():
 @app.route('/')
 @login_required
 def home():
+    logger.debug("Serving index page")
     return render_template('index.html')
 
 @app.route('/dino')
 @login_required
 def dino():
+    logger.debug("Serving dino page")
     return render_template('dino.html')
 
 @app.route('/chess')
 @login_required
 def chess():
+    logger.debug("Serving chess page")
     return render_template('chess.html')
 
 @app.route('/flappy')
 @login_required
 def flappy():
+    logger.debug("Serving flappy page")
     return render_template('flappy.html')
 
 @app.route('/api/dino/train', methods=['POST'])
 def train_dino_ai():
-    generations = request.json.get('generations', 5)
-    dino_ai.train(generations)
-    return jsonify({
-        'success': True,
-        'generation':     dino_ai.current_generation,
-        'best_fitness':   dino_ai.best_fitness,
-        'fitness_chart':  dino_ai.get_fitness_chart(),
-        'species_chart':  dino_ai.get_species_chart(),
-        'network_chart':  dino_ai.get_network_chart()
-    })
+    if not dino_ai:
+        logger.error("DinoGameAI not initialized")
+        return jsonify({'success': False, 'error': 'AI not initialized'}), 500
+
+    try:
+        generations = request.json.get('generations', 5)
+        logger.info(f"Starting training for {generations} generations")
+
+        result = dino_ai.train(generations)
+        logger.debug(f"Train result: {result}")
+
+        response = {
+            'success': True,
+            'generation': result.get('generation', dino_ai.current_generation),
+            'best_fitness': result.get('best_fitness', dino_ai.best_fitness),
+            'fitness_chart': dino_ai.get_fitness_chart(),
+            'species_chart': dino_ai.get_species_chart(),
+            'network_chart': dino_ai.get_network_chart()
+        }
+
+        # Log chart data presence
+        logger.debug(f"Train response: success={response['success']}, "
+                     f"generation={response['generation']}, "
+                     f"best_fitness={response['best_fitness']}, "
+                     f"fitness_chart={'Valid' if response['fitness_chart'] else 'Missing'}, "
+                     f"species_chart={'Valid' if response['species_chart'] else 'Missing'}, "
+                     f"network_chart={'Valid' if response['network_chart'] else 'Missing'}")
+
+        return jsonify(response)
+    except Exception as e:
+        logger.error(f"Error in train_dino_ai: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/dino/visualizations', methods=['GET'])
+def get_dino_visualizations():
+    if not dino_ai:
+        logger.error("DinoGameAI not initialized")
+        return jsonify({'success': False, 'error': 'AI not initialized'}), 500
+
+    try:
+        response = {
+            'success': True,
+            'generation': dino_ai.current_generation,
+            'best_fitness': dino_ai.best_fitness,
+            'fitness_chart': dino_ai.get_fitness_chart(),
+            'species_chart': dino_ai.get_species_chart(),
+            'network_chart': dino_ai.get_network_chart()
+        }
+
+        logger.debug(f"Visualizations response: success={response['success']}, "
+                     f"generation={response['generation']}, "
+                     f"best_fitness={response['best_fitness']}, "
+                     f"fitness_chart={'Valid' if response['fitness_chart'] else 'Missing'}, "
+                     f"species_chart={'Valid' if response['species_chart'] else 'Missing'}, "
+                     f"network_chart={'Valid' if response['network_chart'] else 'Missing'}")
+
+        return jsonify(response)
+    except Exception as e:
+        logger.error(f"Error in get_dino_visualizations: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/flappy/train', methods=['POST'])
 def train_flappy_ai():
-    generations = request.json.get('generations', 5)
-    flappy_ai.train(generations)
-    return jsonify({
-        'success': True,
-        'generation':     flappy_ai.current_generation,
-        'best_fitness':   flappy_ai.best_fitness,
-        'fitness_chart':  flappy_ai.get_fitness_chart(),
-        'species_chart':  flappy_ai.get_species_chart(),
-        'network_chart':  flappy_ai.get_network_chart()
-    })
+    if not flappy_ai:
+        logger.error("FlappyBirdAI not initialized")
+        return jsonify({'success': False, 'error': 'AI not initialized'}), 500
+
+    try:
+        generations = request.json.get('generations', 5)
+        logger.info(f"Starting Flappy training for {generations} generations")
+
+        result = flappy_ai.train(generations)
+        logger.debug(f"Flappy train result: {result}")
+
+        response = {
+            'success': True,
+            'generation': result.get('generation', flappy_ai.current_generation),
+            'best_fitness': result.get('best_fitness', flappy_ai.best_fitness),
+            'fitness_chart': flappy_ai.get_fitness_chart(),
+            'species_chart': flappy_ai.get_species_chart(),
+            'network_chart': flappy_ai.get_network_chart()
+        }
+
+        logger.debug(f"Flappy train response: success={response['success']}, "
+                     f"generation={response['generation']}, "
+                     f"best_fitness={response['best_fitness']}, "
+                     f"fitness_chart={'Valid' if response['fitness_chart'] else 'Missing'}, "
+                     f"species_chart={'Valid' if response['species_chart'] else 'Missing'}, "
+                     f"network_chart={'Valid' if response['network_chart'] else 'Missing'}")
+
+        return jsonify(response)
+    except Exception as e:
+        logger.error(f"Error in train_flappy_ai: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/dino/action', methods=['POST'])
 def get_dino_action():
-    game_state = request.json.get('game_state', [100, 20, 10])
-    action     = dino_ai.get_action(game_state)
-    return jsonify({ 'action': action })
+    if not dino_ai:
+        logger.error("DinoGameAI not initialized")
+        return jsonify({'success': False, 'error': 'AI not initialized'}), 500
+
+    try:
+        game_state = request.json.get('game_state', [100, 20, 10])
+        logger.debug(f"Received game_state: {game_state}")
+        action = dino_ai.get_action(game_state)
+        logger.debug(f"Dino action: {action}")
+        return jsonify({'action': action})
+    except Exception as e:
+        logger.error(f"Error in get_dino_action: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/flappy/action', methods=['POST'])
 def get_flappy_action():
-    game_state = request.json.get('game_state', [100, 50, 50])
-    action     = flappy_ai.get_action(game_state)
-    return jsonify({ 'action': action })
+    if not flappy_ai:
+        logger.error("FlappyBirdAI not initialized")
+        return jsonify({'success': False, 'error': 'AI not initialized'}), 500
 
-@app.route('/api/placeholder_charts')
-def placeholder_charts():
-    # Create placeholder charts for initial display
-
-    # Fitness chart
-    fig1 = Figure(figsize=(10, 6))
-    canvas1 = FigureCanvas(fig1)
-    ax1 = fig1.add_subplot(111)
-    x = np.arange(10)
-    y = np.random.rand(10) * 100
-    ax1.plot(x, y, 'b-', label='Best Fitness')
-    ax1.set_xlabel('Generation')
-    ax1.set_ylabel('Fitness')
-    ax1.set_title('Fitness over Generations')
-    ax1.legend()
-    ax1.grid(True)
-    buf1 = io.BytesIO()
-    canvas1.print_png(buf1)
-    fitness_chart = base64.b64encode(buf1.getbuffer()).decode('ascii')
-
-    # Species chart
-    fig2 = Figure(figsize=(10, 6))
-    canvas2 = FigureCanvas(fig2)
-    ax2 = fig2.add_subplot(111)
-    y2 = np.random.randint(1, 10, 10)
-    ax2.plot(x, y2, 'g-')
-    ax2.set_xlabel('Generation')
-    ax2.set_ylabel('Number of Species')
-    ax2.set_title('Species Count over Generations')
-    ax2.grid(True)
-    buf2 = io.BytesIO()
-    canvas2.print_png(buf2)
-    species_chart = base64.b64encode(buf2.getbuffer()).decode('ascii')
-
-    # Network chart
-    fig3 = Figure(figsize=(12, 9))
-    canvas3 = FigureCanvas(fig3)
-    ax3 = fig3.add_subplot(111)
-    ax3.scatter(
-        [0.1, 0.1, 0.1, 0.5, 0.5, 0.9],
-        [0.2, 0.5, 0.8, 0.3, 0.7, 0.5],
-        s=300,
-        c=['lightblue','lightblue','lightblue','lightgray','lightgray','lightgreen']
-    )
-    connections = [
-        ([0.1,0.2],[0.5,0.3]),([0.1,0.2],[0.5,0.7]),
-        ([0.1,0.5],[0.5,0.3]),([0.1,0.5],[0.5,0.7]),
-        ([0.1,0.8],[0.5,0.3]),([0.1,0.8],[0.5,0.7]),
-        ([0.5,0.3],[0.9,0.5]),([0.5,0.7],[0.9,0.5])
-    ]
-    for (x1,y1),(x2,y2) in connections:
-        ax3.plot([x1,x2],[y1,y2],'g-',linewidth=2)
-    labels = {
-        (0.1,0.2):'Input 1',(0.1,0.5):'Input 2',(0.1,0.8):'Input 3',
-        (0.5,0.3):'Hidden 1',(0.5,0.7):'Hidden 2',(0.9,0.5):'Output'
-    }
-    for (x1,y1),txt in labels.items():
-        ax3.text(x1,y1,txt,ha='center',va='center')
-    ax3.set_xlim(0,1)
-    ax3.set_ylim(0,1)
-    ax3.set_title('Neural Network Structure')
-    ax3.axis('off')
-    buf3 = io.BytesIO()
-    canvas3.print_png(buf3)
-    network_chart = base64.b64encode(buf3.getbuffer()).decode('ascii')
-
-    return jsonify({
-        'fitness_chart':  fitness_chart,
-        'species_chart':  species_chart,
-        'network_chart':  network_chart
-    })
+    try:
+        game_state = request.json.get('game_state', [100, 50, 50])
+        logger.debug(f"Received flappy game_state: {game_state}")
+        action = flappy_ai.get_action(game_state)
+        logger.debug(f"Flappy action: {action}")
+        return jsonify({'action': action})
+    except Exception as e:
+        logger.error(f"Error in get_flappy_action: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # --- TIC TAC TOE ---
 @app.route('/tictactoe')
 @login_required
 def tic_tac_toe():
+    logger.debug("Serving tictactoe page")
     return render_template('tictactoe.html')
 
 def check_winner(board):
@@ -222,12 +257,18 @@ def minimax(board, player, ai_symbol, human_symbol):
 
 @app.route('/api/tictactoe/ai_move', methods=['POST'])
 def tictactoe_ai_move():
-    data         = request.json
-    board        = data.get('board', [''] * 9)
-    ai_symbol    = data.get('ai', 'O')
-    human_symbol = 'X' if ai_symbol == 'O' else 'O'
-    _, move      = minimax(board, ai_symbol, ai_symbol, human_symbol)
-    return jsonify({ 'move': move })
+    try:
+        data = request.json
+        board = data.get('board', [''] * 9)
+        ai_symbol = data.get('ai', 'O')
+        human_symbol = 'X' if ai_symbol == 'O' else 'O'
+        logger.debug(f"Tic-Tac-Toe board: {board}, AI: {ai_symbol}")
+        _, move = minimax(board, ai_symbol, ai_symbol, human_symbol)
+        logger.debug(f"Tic-Tac-Toe AI move: {move}")
+        return jsonify({'move': move})
+    except Exception as e:
+        logger.error(f"Error in tictactoe_ai_move: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -288,4 +329,4 @@ if __name__ == '__main__':
     os.makedirs('static/images', exist_ok=True)
     os.makedirs('checkpoints', exist_ok=True)
 
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000, use_reloader=False)

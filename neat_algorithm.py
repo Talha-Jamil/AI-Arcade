@@ -23,12 +23,14 @@ class NEATAlgorithm:
             checkpoint_prefix (str): Prefix for checkpoint files
             checkpoint_dir (str): Directory to store checkpoints
         """
-        # Ensure checkpoint directory exists
+        print(f"Initializing NEATAlgorithm with config: {config_file}")  # Debug
         self.checkpoint_dir = checkpoint_dir
         os.makedirs(self.checkpoint_dir, exist_ok=True)
         
-        # Load configuration
         self.config_path = os.path.join(os.path.dirname(__file__), config_file)
+        if not os.path.exists(self.config_path):
+            raise FileNotFoundError(f"Config file not found: {self.config_path}")
+        
         self.config = neat.Config(
             neat.DefaultGenome,
             neat.DefaultReproduction,
@@ -37,13 +39,9 @@ class NEATAlgorithm:
             self.config_path
         )
         
-        # Set checkpoint prefix
         self.checkpoint_prefix = os.path.join(self.checkpoint_dir, checkpoint_prefix)
-        
-        # Initialize population
         self.population = neat.Population(self.config)
         
-        # Add reporters to show progress
         self.population.add_reporter(neat.StdOutReporter(True))
         self.stats = neat.StatisticsReporter()
         self.population.add_reporter(self.stats)
@@ -53,12 +51,11 @@ class NEATAlgorithm:
             filename_prefix=self.checkpoint_prefix
         ))
         
-        # Track metrics for visualization
         self.generation = 0
         self.best_fitness_history = []
         self.avg_fitness_history = []
         self.species_counts = []
-        
+    
     def restore_checkpoint(self, checkpoint_file):
         """
         Restore a population from a checkpoint file.
@@ -71,6 +68,7 @@ class NEATAlgorithm:
             self.population = neat.Checkpointer.restore_checkpoint(full_path)
             print(f"Restored checkpoint: {full_path}")
             return True
+        print(f"Checkpoint not found: {full_path}")
         return False
     
     def get_latest_checkpoint(self):
@@ -83,11 +81,12 @@ class NEATAlgorithm:
         checkpoints = [f for f in os.listdir(self.checkpoint_dir) 
                       if f.startswith(os.path.basename(self.checkpoint_prefix))]
         if not checkpoints:
+            print("No checkpoints found")
             return None
-        
-        # Sort by generation number
         checkpoints.sort(key=lambda x: int(x.split('-')[-1]))
-        return os.path.join(self.checkpoint_dir, checkpoints[-1])
+        latest = os.path.join(self.checkpoint_dir, checkpoints[-1])
+        print(f"Latest checkpoint: {latest}")
+        return latest
     
     def save_best_genome(self, genome, filename='best_genome.pkl'):
         """
@@ -97,9 +96,14 @@ class NEATAlgorithm:
             genome: The genome to save
             filename (str): The filename to save to
         """
-        with open(os.path.join(self.checkpoint_dir, filename), 'wb') as f:
+        if genome is None:
+            print("No genome to save")
+            return
+        filepath = os.path.join(self.checkpoint_dir, filename)
+        with open(filepath, 'wb') as f:
             pickle.dump(genome, f)
-            
+        print(f"Saved best genome to: {filepath}")
+    
     def load_best_genome(self, filename='best_genome.pkl'):
         """
         Load the best genome from a file.
@@ -113,7 +117,10 @@ class NEATAlgorithm:
         filepath = os.path.join(self.checkpoint_dir, filename)
         if os.path.exists(filepath):
             with open(filepath, 'rb') as f:
-                return pickle.load(f)
+                genome = pickle.load(f)
+                print(f"Loaded best genome from: {filepath}")
+                return genome
+        print(f"Best genome file not found: {filepath}")
         return None
     
     def run_generation(self, eval_genomes_function, n=1):
@@ -127,15 +134,10 @@ class NEATAlgorithm:
         Returns:
             The best genome after n generations
         """
-        # Set the evaluation function
-        self.population.reproduction.genome_indexer.eval_function = eval_genomes_function
-        
-        # Run for n generations
+        print(f"Running {n} generations")  # Debug
         best_genome = self.population.run(eval_genomes_function, n)
-        
-        # Update metrics
         self.generation += n
-        
+        print(f"Completed {n} generations. Best genome fitness: {best_genome.fitness if best_genome else 'None'}")
         return best_genome
     
     def update_metrics(self, generation_stats):
@@ -143,73 +145,96 @@ class NEATAlgorithm:
         Update metrics for visualization.
         
         Args:
-            generation_stats: Statistics from the current generation
+            generation_stats: Dictionary with 'best_genome' and 'mean' keys
         """
-        if hasattr(generation_stats, 'best_genome'):
-            self.best_fitness_history.append(generation_stats.best_genome.fitness)
-        if hasattr(generation_stats, 'mean'):
-            self.avg_fitness_history.append(generation_stats.mean)
-        if hasattr(self.stats, 'get_species_sizes'):
-            self.species_counts.append(len(self.stats.get_species_sizes()))
+        print(f"Updating metrics with stats: {generation_stats}")  # Debug
+        if generation_stats.get('best_genome') and hasattr(generation_stats['best_genome'], 'fitness'):
+            self.best_fitness_history.append(generation_stats['best_genome'].fitness)
+        else:
+            self.best_fitness_history.append(0)
+            print("No valid best_genome fitness in generation_stats")
+        
+        if generation_stats.get('mean') is not None:
+            self.avg_fitness_history.append(generation_stats['mean'])
+        else:
+            self.avg_fitness_history.append(0)
+            print("No mean fitness in generation_stats")
+        
+        species_sizes = self.stats.get_species_sizes()
+        if species_sizes:
+            self.species_counts.append(len(species_sizes))
+        else:
+            self.species_counts.append(0)
+            print("No species sizes available")
     
     def create_fitness_chart(self):
         """
         Create a chart showing fitness over generations.
         
         Returns:
-            str: Base64 encoded PNG image of the chart
+            str: Base64 encoded PNG image of the chart or None if no data
         """
-        fig = Figure(figsize=(10, 6))
-        canvas = FigureCanvas(fig)
-        ax = fig.add_subplot(111)
-        
-        generations = list(range(1, len(self.best_fitness_history) + 1))
-        
-        ax.plot(generations, self.best_fitness_history, 'b-', label='Best Fitness')
-        if self.avg_fitness_history:
-            ax.plot(generations, self.avg_fitness_history, 'r-', label='Average Fitness')
-        
-        ax.set_xlabel('Generation')
-        ax.set_ylabel('Fitness')
-        ax.set_title('Fitness over Generations')
-        ax.legend()
-        ax.grid(True)
-        
-        # Save to a PNG image
-        buf = io.BytesIO()
-        canvas.print_png(buf)
-        data = base64.b64encode(buf.getbuffer()).decode('ascii')
-        
-        return f"data:image/png;base64,{data}"
+        try:
+            if not self.best_fitness_history:
+                print("No fitness data to plot")
+                return None
+            
+            fig = Figure(figsize=(10, 6))
+            canvas = FigureCanvas(fig)
+            ax = fig.add_subplot(111)
+            
+            generations = list(range(1, len(self.best_fitness_history) + 1))
+            ax.plot(generations, self.best_fitness_history, 'b-', label='Best Fitness')
+            if self.avg_fitness_history and len(self.avg_fitness_history) == len(self.best_fitness_history):
+                ax.plot(generations, self.avg_fitness_history, 'r-', label='Average Fitness')
+            
+            ax.set_xlabel('Generation')
+            ax.set_ylabel('Fitness')
+            ax.set_title('Fitness over Generations')
+            ax.legend()
+            ax.grid(True)
+            
+            buf = io.BytesIO()
+            canvas.print_png(buf)
+            data = base64.b64encode(buf.getvalue()).decode('ascii')
+            print("Fitness chart generated successfully")
+            return f"data:image/png;base64,{data}"
+        except Exception as e:
+            print(f"Error generating fitness chart: {e}")
+            return None
     
     def create_species_chart(self):
         """
         Create a chart showing species count over generations.
         
         Returns:
-            str: Base64 encoded PNG image of the chart
+            str: Base64 encoded PNG image of the chart or None if no data
         """
-        if not self.species_counts:
-            return None
+        try:
+            if not self.species_counts:
+                print("No species data to plot")
+                return None
             
-        fig = Figure(figsize=(10, 6))
-        canvas = FigureCanvas(fig)
-        ax = fig.add_subplot(111)
-        
-        generations = list(range(1, len(self.species_counts) + 1))
-        
-        ax.plot(generations, self.species_counts, 'g-')
-        ax.set_xlabel('Generation')
-        ax.set_ylabel('Number of Species')
-        ax.set_title('Species Count over Generations')
-        ax.grid(True)
-        
-        # Save to a PNG image
-        buf = io.BytesIO()
-        canvas.print_png(buf)
-        data = base64.b64encode(buf.getbuffer()).decode('ascii')
-        
-        return f"data:image/png;base64,{data}"
+            fig = Figure(figsize=(10, 6))
+            canvas = FigureCanvas(fig)
+            ax = fig.add_subplot(111)
+            
+            generations = list(range(1, len(self.species_counts) + 1))
+            ax.plot(generations, self.species_counts, 'g-', label='Species Count')
+            ax.set_xlabel('Generation')
+            ax.set_ylabel('Number of Species')
+            ax.set_title('Species Count over Generations')
+            ax.legend()
+            ax.grid(True)
+            
+            buf = io.BytesIO()
+            canvas.print_png(buf)
+            data = base64.b64encode(buf.getvalue()).decode('ascii')
+            print("Species chart generated successfully")
+            return f"data:image/png;base64,{data}"
+        except Exception as e:
+            print(f"Error generating species chart: {e}")
+            return None
     
     def create_network_structure_chart(self, genome):
         """
@@ -219,30 +244,28 @@ class NEATAlgorithm:
             genome: The genome to visualize
             
         Returns:
-            str: Base64 encoded PNG image of the network structure
+            str: Base64 encoded PNG image of the network structure or None if invalid
         """
-        if genome is None:
-            return None
+        try:
+            if genome is None:
+                print("No genome provided for network chart")
+                return None
             
-        # Create the network
-        network = neat.nn.FeedForwardNetwork.create(genome, self.config)
-        
-        # Get node and connection information
-        node_names = {-1: 'Distance', -2: 'Height', -3: 'Speed', 0: 'Jump'}
-        
-        fig = Figure(figsize=(12, 9))
-        canvas = FigureCanvas(fig)
-        ax = fig.add_subplot(111)
-        
-        # Draw the network
-        visualize_network(genome, self.config, ax=ax, node_names=node_names)
-        
-        # Save to a PNG image
-        buf = io.BytesIO()
-        canvas.print_png(buf)
-        data = base64.b64encode(buf.getbuffer()).decode('ascii')
-        
-        return f"data:image/png;base64,{data}"
+            fig = Figure(figsize=(12, 9))
+            canvas = FigureCanvas(fig)
+            ax = fig.add_subplot(111)
+            
+            node_names = {-1: 'Distance', -2: 'Height', -3: 'Speed', 0: 'Jump'}
+            visualize_network(genome, self.config, ax=ax, node_names=node_names)
+            
+            buf = io.BytesIO()
+            canvas.print_png(buf)
+            data = base64.b64encode(buf.getvalue()).decode('ascii')
+            print("Network chart generated successfully")
+            return f"data:image/png;base64,{data}"
+        except Exception as e:
+            print(f"Error generating network chart: {e}")
+            return None
 
 def visualize_network(genome, config, ax=None, node_names=None):
     """
@@ -261,19 +284,15 @@ def visualize_network(genome, config, ax=None, node_names=None):
     if node_names is None:
         node_names = {}
     
-    # Create network
     nodes = {}
     for k in config.genome_config.input_keys:
         nodes[k] = {'type': 'input', 'name': node_names.get(k, f'Input {k}')}
-    
     for k in config.genome_config.output_keys:
         nodes[k] = {'type': 'output', 'name': node_names.get(k, f'Output {k}')}
-    
     for k, g in genome.nodes.items():
         if k not in nodes:
             nodes[k] = {'type': 'hidden', 'name': node_names.get(k, f'Hidden {k}')}
     
-    # Calculate positions
     input_nodes = [k for k, v in nodes.items() if v['type'] == 'input']
     output_nodes = [k for k, v in nodes.items() if v['type'] == 'output']
     hidden_nodes = [k for k, v in nodes.items() if v['type'] == 'hidden']
@@ -282,48 +301,42 @@ def visualize_network(genome, config, ax=None, node_names=None):
     n_outputs = len(output_nodes)
     n_hidden = len(hidden_nodes)
     
-    # Position nodes
-    for i, k in enumerate(input_nodes):
-        nodes[k]['position'] = (0.1, 0.1 + 0.8 * i / max(1, n_inputs - 1))
+    y_gap = 1.0 / (max(n_inputs, n_outputs) + 1)
     
-    for i, k in enumerate(output_nodes):
-        nodes[k]['position'] = (0.9, 0.1 + 0.8 * i / max(1, n_outputs - 1))
+    positions = {}
     
-    for i, k in enumerate(hidden_nodes):
-        nodes[k]['position'] = (0.5, 0.1 + 0.8 * i / max(1, n_hidden - 1))
+    # Position input nodes on left
+    for i, node in enumerate(sorted(input_nodes)):
+        positions[node] = (0.1, 1 - (i + 1) * y_gap)
+    
+    # Position output nodes on right
+    for i, node in enumerate(sorted(output_nodes)):
+        positions[node] = (0.9, 1 - (i + 1) * y_gap)
+    
+    # Position hidden nodes in the middle vertically spaced
+    for i, node in enumerate(sorted(hidden_nodes)):
+        positions[node] = (0.5, 1 - (i + 1) * y_gap)
+    
+    # Draw nodes
+    for node, pos in positions.items():
+        x, y = pos
+        node_type = nodes[node]['type']
+        color = 'lightblue' if node_type == 'input' else 'lightgreen' if node_type == 'output' else 'lightgray'
+        ax.scatter(x, y, s=1000, color=color, edgecolor='black', zorder=5)
+        ax.text(x, y, nodes[node]['name'], fontsize=10, ha='center', va='center', zorder=6)
     
     # Draw connections
     for cg in genome.connections.values():
         if not cg.enabled:
             continue
-        
-        input_node = nodes[cg.key[0]]
-        output_node = nodes[cg.key[1]]
-        
-        x1, y1 = input_node['position']
-        x2, y2 = output_node['position']
-        
-        # Determine color based on weight
-        color = 'green' if cg.weight > 0 else 'red'
-        width = 0.1 + abs(cg.weight) / 5.0
-        
-        ax.plot([x1, x2], [y1, y2], color=color, linewidth=width, alpha=0.8)
-    
-    # Draw nodes
-    for k, node in nodes.items():
-        x, y = node['position']
-        
-        if node['type'] == 'input':
-            color = 'lightblue'
-        elif node['type'] == 'output':
-            color = 'lightgreen'
-        else:
-            color = 'lightgray'
-        
-        ax.scatter(x, y, s=300, color=color, zorder=10)
-        ax.text(x, y, node['name'], ha='center', va='center', zorder=11)
+        in_pos = positions.get(cg.key[0])
+        out_pos = positions.get(cg.key[1])
+        if in_pos and out_pos:
+            ax.annotate("",
+                        xy=out_pos, xycoords='data',
+                        xytext=in_pos, textcoords='data',
+                        arrowprops=dict(arrowstyle="->", color='black', lw=2))
     
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
-    ax.set_title('Neural Network Structure')
     ax.axis('off')

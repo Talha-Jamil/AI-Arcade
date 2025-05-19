@@ -78,7 +78,7 @@ function draw() {
   fill(255);
   textSize(24);
   textAlign(LEFT, TOP);
-  text("Uzair Abbas", 10, 10);
+  text("", 10, 10);
 
   // Should we speed up cycles per frame
   let cycles = speedSlider.value();

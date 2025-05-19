@@ -1,3 +1,8 @@
+body {
+    background: linear-gradient(135deg, #5D5CDE 0%, #a777e3 100%);
+    min-height: 100vh;
+}
+
 .text-align-center {
     text-align: center;
 }

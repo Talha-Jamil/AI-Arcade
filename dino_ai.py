@@ -69,7 +69,7 @@ class DinoGameAI:
             'mean': np.mean(fitnesses) if fitnesses else 0
         })
 
-        print(f"Generation {self.current_generation} - Max Fitness: {max_fitness}")
+        print(f"Generation {self.current_generation} - Max Fitness: {max_fitness}, Mean Fitness: {np.mean(fitnesses) if fitnesses else 0}")
     
     def simulate_game(self, neural_network):
         """
@@ -205,7 +205,9 @@ class DinoGameAI:
         Returns:
             The best genome after training
         """
+        print(f"Starting training for {generations} generations at {self.current_generation}...")
         best_genome = self.neat_algorithm.run_generation(self.eval_genomes, generations)
+        print(f"Training completed. Current generation: {self.current_generation}, Best fitness: {best_genome.fitness if best_genome else 'None'}")
 
         if best_genome and (not self.best_genome or best_genome.fitness > self.best_fitness):
             self.best_genome = best_genome

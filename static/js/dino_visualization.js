@@ -98,32 +98,35 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // Update charts with API data
     function updateCharts(data) {
-        console.log('Chart data received:', data); // Debug
-        const fitnessChart = document.getElementById('dino-fitness-chart');
-        const speciesChart = document.getElementById('dino-species-chart');
-        const networkChart = document.getElementById('dino-network-chart');
-        
-        if (fitnessChart && data.fitness_chart) {
-            fitnessChart.src = data.fitness_chart;
-            console.log('Fitness chart updated');
-        } else {
-            console.warn('Fitness chart not updated:', { fitnessChart: !!fitnessChart, data: !!data.fitness_chart });
-        }
-        
-        if (speciesChart && data.species_chart) {
-            speciesChart.src = data.species_chart;
-            console.log('Species chart updated');
-        } else {
-            console.warn('Species chart not updated:', { speciesChart: !!speciesChart, data: !!data.species_chart });
-        }
-        
-        if (networkChart && data.network_chart) {
-            networkChart.src = data.network_chart;
-            console.log('Network chart updated');
-        } else {
-            console.warn('Network chart not updated:', { networkChart: !!networkChart, data: !!data.network_chart });
-        }
+    console.log('Chart data received:', data); // Debug
+    const fitnessChart = document.getElementById('dino-fitness-chart');
+    const speciesChart = document.getElementById('dino-species-chart');
+    const networkChart = document.getElementById('dino-network-chart');
+    
+    if (fitnessChart && data.fitness_chart) {
+        fitnessChart.src = data.fitness_chart;
+        console.log('Fitness chart updated');
+    } else {
+        console.warn('Fitness chart not updated:', { fitnessChart: !!fitnessChart, data: !!data.fitness_chart });
+        if (fitnessChart) fitnessChart.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='; // Transparent 1x1 pixel
     }
+    
+    if (speciesChart && data.species_chart) {
+        speciesChart.src = data.species_chart;
+        console.log('Species chart updated');
+    } else {
+        console.warn('Species chart not updated:', { speciesChart: !!speciesChart, data: !!data.species_chart });
+        if (speciesChart) speciesChart.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg=='; // Transparent 1x1 pixel
+    }
+    
+    if (networkChart && data.network_chart) {
+        networkChart.src = data.network_chart;
+        console.log('Network chart updated');
+    } else {
+        console.warn('Network chart not updated:', { networkChart: !!networkChart, data: !!data.network_chart });
+        if (networkChart) networkChart.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJggg=='; // Transparent 1x1 pixel
+    }
+}
     
     // Train Dino AI
     function trainDinoAI() {

@@ -30,10 +30,7 @@ except Exception as e:
     flappy_ai = None
 
 def init_db():
-    #conn = sqlite3.connect('users.db')
-    basedir = os.path.abspath(os.path.dirname(__file__))
-    conn = sqlite3.connect(os.path.join(basedir, 'users.db'))
-
+    conn = sqlite3.connect('users.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS users
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,

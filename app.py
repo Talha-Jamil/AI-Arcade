@@ -8,7 +8,7 @@ import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)  # Generate a secure secret key
+app.secret_key =  os.environ.get("SECRET_KEY", "fallback_local_key")
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -30,7 +30,10 @@ except Exception as e:
     flappy_ai = None
 
 def init_db():
-    conn = sqlite3.connect('users.db')
+    #conn = sqlite3.connect('users.db')
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    conn = sqlite3.connect(os.path.join(basedir, 'users.db'))
+
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS users
                  (id INTEGER PRIMARY KEY AUTOINCREMENT,
